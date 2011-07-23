@@ -18,7 +18,7 @@ Install the dependencies with npm
 Edit the configuration json file in the etc/ directory
 
 	cd etc/
-        cp config.json mybot.json
+	cp config.json mybot.json
 	# edit mybot.json
 
 Modules are enabled on all channels unless one sets
