@@ -1,0 +1,26 @@
+#!/usr/bin/env node
+
+var imports = require('../modules/bot.js'),
+    bot = imports.bot,
+    config = imports.config
+
+// setup modules
+
+var Punchfork = require('../modules/punchfork.js'),
+    punchfork = new Punchfork(config.punchfork)
+
+bot.f(punchfork)
+
+// connect
+
+bot.on('error', function(message) {
+  console.log('irc error:')
+  console.log(message)
+})
+
+bot.once('connected', function() {
+  console.log('connected')
+})
+
+bot.connect()
+console.log('connecting...')
