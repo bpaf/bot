@@ -1,0 +1,20 @@
+{
+  "author": "bpaf",
+  "name": "bot",
+  "description": "IRC bot",
+  "version": "0.0.0",
+  "homepage": "https://github.com/bpaf/bot",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bpaf/bot.git"
+  },
+  "main": "bot.js",
+  "engines": {
+    "node": "~0.4.10"
+  },
+  "dependencies": {
+    "irc": "~0.2.0",
+    "request": "~2.0.1"
+  },
+  "devDependencies": {}
+}

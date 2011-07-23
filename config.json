@@ -1,0 +1,13 @@
+{ 
+  "irc": {
+    "channel": "#IRC_CHANNEL_NAME",
+    "nick": "IRC_NICKNAME_OF_THE_BOT",
+    "server": "IRC.SERVER.ADDRESS",
+    "rate": 10
+  },
+  "punchfork": {
+    "url": "http://api.punchfork.com/",
+    "key": "API_KEY_HERE",
+    "max": 3
+  }
+}
