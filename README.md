@@ -15,14 +15,21 @@ Install the dependencies with npm
 
 # Usage
 
-Edit the configuration json file
+Edit the configuration json file in the etc/ directory
 
-	cp config.json mybot.json
+	cd etc/
+        cp config.json mybot.json
 	# edit mybot.json
+
+Modules are enabled on all channels unless one sets
+
+	config.<module>.channels = ["#<channel>", …]
+
+To disable a module just set it to the empty list.
 
 Run with
 
-	node bot.js mybot.json
+	bin/bot etc/mybot.json
 
 Cheers.
 

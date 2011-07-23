@@ -9,7 +9,7 @@ var imports = require('../modules/bot.js'),
 var Punchfork = require('../modules/punchfork.js'),
     punchfork = new Punchfork(config.punchfork)
 
-bot.f(punchfork)
+bot.hook(punchfork)
 
 // connect
 
