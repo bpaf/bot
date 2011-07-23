@@ -1,7 +1,7 @@
 // Setup
 
 if (process.argv.length !== 3) { // ['node', '*.js', 'config.json']
-  console.error('Usage: node punchforkbot <config.json>')
+  console.error('Usage: node bot.js <config.json>')
   process.exit(1)
 } else {
   var configPath = __dirname + '/' + process.argv[2] // './config.json'
