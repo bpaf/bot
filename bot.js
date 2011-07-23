@@ -39,7 +39,7 @@ bot.on('message' + config.irc.channel, function(from, msg) {
   if (bot.chatty) {
     var asked = false
     msg = msg.replace(/^\s+/, '').replace(/\s+/g,' ').replace(/\s+$/,'')
-    var nick_re = new RegExp(config.irc.nick+':?\\s*')
+    var nick_re = new RegExp('^\\s*'+config.irc.nick+':?\\s*')
     if (msg.match(nick_re)) {
       asked = true
       msg = msg.replace(nick_re, '')
