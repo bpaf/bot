@@ -42,7 +42,7 @@ bot.on('message' + config.irc.channel, function(from, msg) {
     var nick_re = new RegExp(config.irc.nick+':?\\s*')
     if (msg.match(nick_re)) {
       asked = true
-      message = message.replace(nick_re, '')
+      msg = msg.replace(nick_re, '')
     }
     if (msg.match(/^recipe/)) {
       asked = true
