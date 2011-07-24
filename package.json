@@ -2,13 +2,13 @@
   "author": "bpaf",
   "name": "bot",
   "description": "IRC bot",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "homepage": "https://github.com/bpaf/bot",
   "repository": {
     "type": "git",
     "url": "git://github.com/bpaf/bot.git"
   },
-  "main": "bot.js",
+  "main": "bin/bot",
   "engines": {
     "node": "~0.4.10"
   },
