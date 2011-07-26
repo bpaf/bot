@@ -24,14 +24,32 @@ var irc = require('irc')
 
 var bot = exports.bot = new irc.Client(config.irc.server, config.irc.nick, config.irc)
 
-// rate-limiter semaphore
-bot.chatty = true
+// rate-limiter - semaphores
+// bot.chatty = { '#channel': { 'module': true, … }, … }
+bot.chatty = {}
+bot.chatty.on = function(channel, module_name) {
+  if (channel in bot.chatty) {
+    bot.chatty[channel][module_name] = true
+  } else {
+    bot.chatty[channel] = {}
+    bot.chatty.on(channel, module_name)
+  }
+}
+bot.chatty.off = function(channel, module_name) {
+  bot.chatty[channel][module_name] = false
+  setTimeout(function() {
+    bot.chatty.on(channel, module_name)
+  }, config.irc.rate * 1000)
+}
+bot.isChatty = function(channel, module_name) {
+  return bot.chatty[channel][module_name] || false
+}
 
-// rate-limiter - gives the callback config.irc.rate seconds
-// to work alone before accepting any other requests
+// rate-limiter - gives the module's callback
+//  config.irc.rate seconds to work alone
+//  before accepting any other requests
 bot.handle = function(nick, channel, message, callback) {
-  bot.chatty = false
-  setTimeout(function() { bot.chatty = true }, config.irc.rate * 1000)
+  bot.chatty.off(channel, callback.module_name)
   callback(bot, nick, channel, message)
 }
 
@@ -43,9 +61,8 @@ bot.onMessage = function(channel, callback) {
       bot.onMessage(channel, callback)
     })
   } else {
-    //console.log(['registering',callback.name,'on',channel].join(' '))
     bot.on('message' + channel, function(from, msg) {
-      if (bot.chatty) {
+      if (bot.isChatty(channel, callback.module_name)) {
         msg = msg.replace(/^\s+/, '').replace(/\s+/g,' ').replace(/\s+$/,'')
         var nick_re = new RegExp('^\\s*'+config.irc.nick+':?\\s*')
         if (msg.match(nick_re)) {
@@ -65,7 +82,9 @@ bot.hook = function(module) {
     channels = config.irc.channels
   }
   channels.forEach(function(channel) {
-    module.handler.name = module.name + '.handler'
-    bot.onMessage(channel, module.handler.bind(module))
+    var callback = module.handler.bind(module)
+    callback.module_name = module.name
+    bot.chatty.on(channel, module.name)
+    bot.onMessage(channel, callback)
   })
 }
