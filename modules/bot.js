@@ -93,6 +93,6 @@ bot.hook = function(module) {
     bot.on('quit', module.stop.bind(module))
   }
   if (module.start) {
-    process.nextTick(module.start)
+    process.nextTick(module.start.bind(module))
   }
 }
