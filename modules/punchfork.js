@@ -80,17 +80,15 @@ Punchfork.prototype.format = function(recipe, suppress) {
 }
 
 Punchfork.prototype.random = function(bot, nick, channel) {
-  that = this
   this.random_recipe(function(response) {
     var recipe = response.recipe
-    var message = that.format(recipe)
+    var message = this.format(recipe)
     console.log(['recipe for', nick, 'at', recipe.pf_url].join(' ')) 
     bot.say(channel, message)
-  })
+  }.bind(this))
 }
 
 Punchfork.prototype.search = function(bot, nick, channel, query) {
-  that = this
   this.recipes(query, function(response) {
     var count = response.count
     if (count === 0) {
@@ -98,11 +96,11 @@ Punchfork.prototype.search = function(bot, nick, channel, query) {
       bot.say(channel, 'no recipes')
     } else {
       var recipes = response.recipes
-      var message = that.format(recipes)
+      var message = this.format(recipes)
       console.log([nick, count, 'for', '"' + query + '"'].join(' '))
       bot.say(channel, message)
     }
-  })
+  }.bind(this))
 }
 
 Punchfork.prototype.handler = function(bot, nick, channel, msg) {
