@@ -74,8 +74,8 @@ bot.onMessage = function(channel, callback) {
   }
 }
 
-// hook up a module.handler function
-//  to the relevant message#channel events
+// hook up a module.handler function (to the relevant message#channel events)
+//  and module.{start,stop} if needed (reps. efficiently now and on('quit', …)
 bot.hook = function(module) {
   var channels = []
   if ('channels' in config[module.name]) {
@@ -89,4 +89,10 @@ bot.hook = function(module) {
     bot.chatty.on(channel, module.name)
     bot.onMessage(channel, callback)
   })
+  if (module.stop) {
+    bot.on('quit', module.stop.bind(module))
+  }
+  if (module.start) {
+    process.nextTick(module.start)
+  }
 }
