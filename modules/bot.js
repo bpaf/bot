@@ -49,8 +49,15 @@ bot.isChatty = function(channel, module_name) {
 //  config.irc.rate seconds to work alone
 //  before accepting any other requests
 bot.handle = function(nick, channel, message, callback) {
-  bot.chatty.off(channel, callback.module_name)
-  callback(bot, nick, channel, message)
+  if (bot.isChatty(channel, callback.module_name)) {
+    message = message.trim().replace(/\s+/g,' ')
+    var nick_re = new RegExp('^\\s*'+bot.nick+':?\\s*')
+    if (message.match(nick_re)) {
+      message = message.replace(nick_re, '')
+      bot.chatty.off(channel, callback.module_name)
+      callback(bot, nick, channel, message)
+    }
+  }
 }
 
 // bot.onMessage(callback) for adding an handler for all the channels
@@ -61,19 +68,14 @@ bot.onMessage = function(channel, callback) {
       bot.onMessage(channel, callback)
     })
   } else {
-    bot.on('message' + channel, function(from, msg) {
-      if (bot.isChatty(channel, callback.module_name)) {
-        msg = msg.replace(/^\s+/, '').replace(/\s+/g,' ').replace(/\s+$/,'')
-        var nick_re = new RegExp('^\\s*'+config.irc.nick+':?\\s*')
-        if (msg.match(nick_re)) {
-          msg = msg.replace(nick_re, '')
-          bot.handle(from, channel, msg, callback)
-        }
-      }
+    bot.on('message' + channel, function(from, message) {
+      bot.handle(from, channel, message, callback)
     })
   }
 }
 
+// hook up a module.handler function
+//  to the relevant message#channel events
 bot.hook = function(module) {
   var channels = []
   if ('channels' in config[module.name]) {
