@@ -5,11 +5,14 @@ var imports = require('../modules/bot.js'),
     config = imports.config
 
 // setup modules
-
-var Punchfork = require('../modules/punchfork.js'),
-    punchfork = new Punchfork(config.punchfork)
-
-bot.hook(punchfork)
+//  found in the configuration JSON, excluding config.irc
+Object.keys(config).filter(function(key) { return key !== 'irc' })
+  .forEach(function (name) {
+    var Module = require('../modules/' + name + '.js')
+        module = new Module(config[name])
+    console.log(name+': loading…')
+    bot.hook(module)
+  })
 
 // connect
 

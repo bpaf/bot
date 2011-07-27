@@ -1,6 +1,6 @@
 # Synopsis
 
-This is an IRC bot that I built for my own needs.
+This is an IRC bot that I built for my own needs. It's written in JavaScript and it runs on the Node.js platform.
 
 # Installation
 
@@ -15,7 +15,9 @@ Install the dependencies with npm
 
 # Usage
 
-Edit the configuration json file in the etc/ directory
+## 1. Configuration (REQUIRED)
+
+Edit the configuration JSON file in the `etc/` directory
 
 	cd etc/
 	cp config.json mybot.json
@@ -25,7 +27,11 @@ Modules are enabled on all channels unless one sets
 
 	config.<module>.channels = ["#<channel>", …]
 
-To disable a module just set it to the empty list.
+Set it to the empty list `[]` to stop inbound message events to a module.
+
+To avoid loading a module altogether, remove the whole `"<module>": { … },` section from `mybot.json`.
+
+## 2. Run
 
 Run with
 
