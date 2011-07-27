@@ -83,18 +83,19 @@ bot.hook = function(module) {
   } else {
     channels = config.irc.channels
   }
-  channels.forEach(function(channel) {
-    if (module.start) {
-      process.nextTick(module.start.bind(module, channel))
-    }
-    if (module.handler){
-      var callback = module.handler.bind(module)
-      callback.module_name = module.name
-      bot.chatty.on(channel, module.name)
-      bot.onMessage(channel, callback)
-    }
-  })
+  
+  if (module.handler){
+    channels.forEach(function(channel) {
+        var callback = module.handler.bind(module)
+        callback.module_name = module.name
+        bot.chatty.on(channel, module.name)
+        bot.onMessage(channel, callback)
+    })
+  }
   if (module.stop) {
     bot.on('quit', module.stop.bind(module))
+  }
+  if (module.start) {
+    process.nextTick(module.start.bind(module))
   }
 }
