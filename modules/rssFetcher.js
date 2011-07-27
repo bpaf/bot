@@ -24,8 +24,11 @@ function RssFetcher(config, bot) {
     var files = fs.readdirSync(handlers_path);
     
     files.forEach(function(file){
-      if(file.match(/\.js$/)){
-        var feed = require(handlers_path + file);
+      file = /(.+)\.js$/.exec(file);
+      
+      if(file){
+        var feed = require(handlers_path + file[0]);
+        feed.name = file[1];
         handlers[feed.name] = feed.handler;
         formats[feed.name] = feed.format;
                 

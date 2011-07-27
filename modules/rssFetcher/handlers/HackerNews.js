@@ -1,5 +1,3 @@
-exports.name = "HackerNews"; // (identifier) same of the config file 
-
 exports.url = "http://feedhint.com/handler.php?";
 
 exports.handler = function(feed, callback, lastList, error, dom) {
