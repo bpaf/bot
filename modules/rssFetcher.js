@@ -8,7 +8,7 @@ var fs          = require('fs'),
     htmlparser  = require('htmlparser'),
     request     = require('request');
 
-module.exports = RssFetcher
+module.exports = RssFetcher;
 
 function RssFetcher(config, bot) {  
   console.log("[!!] RssFetcher object created");
@@ -20,22 +20,18 @@ function RssFetcher(config, bot) {
     var rss_feeds = config.rss_feeds;
 
     // get last elm fetched for each feed
-    for (var i in rss_feeds) {
-      var feed = rss_feeds[i];
-
+    rss_feeds.forEach(function(feed) {
       var filename = __basedir + "/.rss-" + feed.name + ".db";
-
       var fd = fs.openSync(filename, "a+"); // create file if necessary
       fs.closeSync(fd);
 
       console.log("[!!] Opening data file: " + filename);
-
       lastList[feed.name] = fs.readFileSync(filename,'utf8').replace('\n','');
-    }
+    });
   }
 }
 
-RssFetcher.prototype.name = 'rssFetcher'
+RssFetcher.prototype.name = 'rssFetcher';
 
 RssFetcher.prototype.start = function() {
   var that = this;
@@ -46,12 +42,12 @@ RssFetcher.prototype.start = function() {
     console.log("[!!] Registering function for " + feed.name);
   
     setInterval(function(){
-      fetchRSS(feed, sendNewItems.bind(that, feed));
+      fetchRSS(feed, sendNewItems.bind({}, feed));
     }, feed.refresh_time*1000);
+    
   });
   
   function sendNewItems (feed, new_items){
-        
     var filename = __basedir + "/.rss-" + feed.name + ".db";
     fs.writeFileSync(filename, lastList[feed.name]+'\n', 'utf8');
     
@@ -59,12 +55,12 @@ RssFetcher.prototype.start = function() {
     console.log("[!!] There are " + new_items.length + " new items for " + feed.name);
 
     new_items.forEach(function(item) {
-      var chan_list = feed.channels;
-      var fhformat = handlers[feed.handler].format;
-      console.log(fhformat(item));
+      var channels = feed.channels;
+      var format   = handlers[feed.handler].format;
+      console.log(format(item));
       
-      chan_list.forEach(function(channel){
-        that.bot.say(channel, fhformat(item));
+      channels.forEach(function(channel){
+        that.bot.say(channel, format(item));
       });
     });
   }
@@ -73,11 +69,9 @@ RssFetcher.prototype.start = function() {
 
     console.log('[!!] Fetching feed for ' + feed.name + ' ..');
 
-    var fhandler = handlers[feed.handler];
-
-    var handler = function(error, dom){ fhandler(feed, cb, error, dom); }
-    handler    = new htmlparser.RssHandler(handler);
-    var parser = new htmlparser.Parser(handler);
+    var fhandler = handlers[feed.handler].bind({}, feed, cb);    
+    var handler  = new htmlparser.RssHandler(fhandler);
+    var parser   = new htmlparser.Parser(handler);
 
     request({ url: feed.url, encoding: 'utf8' }, function(error, response, body) {
 
@@ -116,19 +110,15 @@ handlers['HNHandler'] = function (feed, callback, error, dom) {
   }
   else {
     for (var i in items){
-      
-      if( items[i]['pubDate'] > lastList[feed.name] ) {
-        new_items.push(items[i]);
-      }
-      else {
+      if( items[i]['pubDate'] <= lastList[feed.name] ) {
         break;
       }
+      new_items.push(items[i]);
     }
   }
   
   lastList[feed.name] = items[0]['pubDate'];    
   callback(new_items);
-
 }
 
 handlers['HNHandler']['format'] = function(data) {
