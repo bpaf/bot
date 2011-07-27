@@ -75,7 +75,7 @@ bot.onMessage = function(channel, callback) {
 }
 
 // hook up a module.handler function (to the relevant message#channel events)
-//  and module.{start,stop} if needed (reps. efficiently now and on('quit', …)
+//  and module.{start,stop} if needed (resp. now and at ^C)
 bot.hook = function(module) {
   var channels = []
   if ('channels' in config[module.name]) {
@@ -90,9 +90,23 @@ bot.hook = function(module) {
     bot.onMessage(channel, callback)
   })
   if (module.stop) {
-    bot.on('quit', module.stop.bind(module))
+    void bot.stopHandlers.push(module.stop.bind(module))
   }
   if (module.start) {
     process.nextTick(module.start.bind(module))
+  }
+}
+
+// SIGINT handling
+//  Calls the <module>.stop functions that have registered.
+//  Each one must call the next one that gets passed as the only argument.
+bot.stopHandlers = []
+
+bot.stop = function() {
+  if (bot.atStop.length === 0) {
+    console.log('send ^C again to exit')
+  } else {
+    var stop_module = bot.stopHandlers.shift()
+    stop_module(bot.stop)
   }
 }

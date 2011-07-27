@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 var imports = require('../modules/bot.js'),
-    bot = imports.bot,
-    config = imports.config
+    bot     = imports.bot,
+    config  = imports.config
 
-// setup modules
+// Setup modules
 //  found in the configuration JSON, excluding config.irc
 Object.keys(config).filter(function(key) { return key !== 'irc' })
   .forEach(function (name) {
@@ -14,16 +14,21 @@ Object.keys(config).filter(function(key) { return key !== 'irc' })
     bot.hook(module)
   })
 
-// connect
+// Error handling
 
 bot.on('error', function(message) {
   console.log('irc error:')
   console.log(message)
 })
 
+// ^C
+process.once('SIGINT', bot.stop)
+
+// Connect
+
 bot.once('connected', function() {
   console.log('connected')
 })
 
 bot.connect()
-console.log('connecting...')
+console.log('connecting…')
