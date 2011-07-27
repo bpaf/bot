@@ -9,5 +9,15 @@
     "url": "http://api.punchfork.com/",
     "key": "API_KEY_HERE",
     "max": 3
+  },
+  "rssFetcher": {
+    "rss_feeds" = [ 
+      {
+        "name": "HackerNews",
+        "refresh_time": 60,
+        "limit": 5,
+        "channels": ["#IRC_CHANNEL_NAME", ...]
+      }
+    ]
   }
 }
