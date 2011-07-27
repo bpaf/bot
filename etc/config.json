@@ -13,10 +13,8 @@
   "rssFetcher": {
     "rss_feeds" = [ 
       {
-        "name": "HN",
-        "url": "http://feedhint.com/handler.php?",
+        "name": "HackerNews",
         "refresh_time": 60,
-        "handler": "HNHandler",
         "limit": 5,
         "channels": ["#IRC_CHANNEL_NAME", ...]
       }

@@ -1,7 +1,9 @@
 __basedir = __dirname.replace(/\/modules$/, '');
 
 var lastList = {};
-var fdList = {};
+var fdList   = {};
+var handlers = {};
+var formats  = {};
 
 var fs          = require('fs'),
     util        = require('util'),
@@ -14,7 +16,26 @@ function RssFetcher(config, bot) {
   console.log("[!!] RssFetcher object created");
   this.config = config;
   this.bot = bot;
+  loadHandlers(this.config);
   loadData();
+  
+  function loadHandlers(config) {
+    var handlers_path = __dirname + '/rssFetcher/handlers/';
+    var files = fs.readdirSync(handlers_path);
+    
+    files.forEach(function(file){
+      if(file.match(/\.js$/)){
+        var feed = require(handlers_path + file);
+        handlers[feed.name] = feed.handler;
+        formats[feed.name] = feed.format;
+                
+        config['rss_feeds'].forEach(function(elm) {
+          if (elm.name == feed.name)
+            elm.url = feed.url;
+        });
+      }
+    });
+  }
   
   function loadData() {
     var rss_feeds = config.rss_feeds;
@@ -56,7 +77,7 @@ RssFetcher.prototype.start = function() {
 
     new_items.forEach(function(item) {
       var channels = feed.channels;
-      var format   = handlers[feed.handler].format;
+      var format   = formats[feed.name];
       console.log(format(item));
       
       channels.forEach(function(channel){
@@ -69,7 +90,7 @@ RssFetcher.prototype.start = function() {
 
     console.log('[!!] Fetching feed for ' + feed.name + ' ..');
 
-    var fhandler = handlers[feed.handler].bind({}, feed, cb);    
+    var fhandler = handlers[feed.name].bind({}, feed, cb, lastList);    
     var handler  = new htmlparser.RssHandler(fhandler);
     var parser   = new htmlparser.Parser(handler);
 
@@ -85,42 +106,4 @@ RssFetcher.prototype.start = function() {
   
   }
 
-}
-
-// Handlers
-
-var handlers = {}
-
-handlers['HNHandler'] = function (feed, callback, error, dom) {
-  
-  if (error) {
-    throw new Error(error)
-  }
-  if (dom === undefined) {
-    console.log('dom in HNHandler is undefined.')
-    return;
-  }
-  
-  var new_items = [];
-  var items = dom['items'];
-      
-  if(!lastList[feed.name]) {
-    console.log('[!!] ' + feed.name + ' first fetch.');
-    new_items = items;
-  }
-  else {
-    for (var i in items){
-      if( items[i]['pubDate'] <= lastList[feed.name] ) {
-        break;
-      }
-      new_items.push(items[i]);
-    }
-  }
-  
-  lastList[feed.name] = items[0]['pubDate'];    
-  callback(new_items);
-}
-
-handlers['HNHandler']['format'] = function(data) {
-  return "HN: " + data.title + " - " + data.link;
 }
