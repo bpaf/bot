@@ -8,8 +8,11 @@ var imports = require('../modules/bot.js'),
 
 var Punchfork = require('../modules/punchfork.js'),
     punchfork = new Punchfork(config.punchfork)
+    
+var RssFetcher = require('../modules/rssFetcher.js'),
+    rssFetcher = new RssFetcher(config.rssFetcher, bot)
 
-bot.hook(punchfork)
+bot.hook(rssFetcher)
 
 // connect
 

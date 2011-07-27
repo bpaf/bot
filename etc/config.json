@@ -9,5 +9,16 @@
     "url": "http://api.punchfork.com/",
     "key": "API_KEY_HERE",
     "max": 3
+  },
+  "rssFetcher": {
+    "rss_feeds" = [ 
+      {
+        "name": "HN",
+        "url": "http://feedhint.com/handler.php?",
+        "refresh_time": 60,
+        "handler": "HNHandler",
+        "limit": 5
+      }
+    ]
   }
 }
