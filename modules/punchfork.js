@@ -104,9 +104,9 @@ Punchfork.prototype.search = function(bot, nick, channel, query) {
 }
 
 Punchfork.prototype.handler = function(bot, nick, channel, msg) {
-  if (msg.match(/^\s*(?:recipe|repice)?\s*$/)) {
+  if (msg.match(/^\s*(?:recipe|repice)\s*$/)) {
     this.random(bot, nick, channel)
-  } else if (msg.match(/^\s*(?:recipe|repice)?.*/)) {
+  } else if (msg.match(/^\s*(?:recipe|repice).*/)) {
     this.search(bot, nick, channel, msg)
   }
 }
