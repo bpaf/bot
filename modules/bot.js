@@ -103,7 +103,7 @@ bot.hook = function(module) {
 bot.stopHandlers = []
 
 bot.stop = function() {
-  if (bot.atStop.length === 0) {
+  if (bot.stopHandlers.length === 0) {
     console.log('send ^C again to exit')
   } else {
     var stop_module = bot.stopHandlers.shift()
