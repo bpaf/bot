@@ -4,13 +4,17 @@ exports.handler = function(feed, callback, lastList, error, dom) {
   
   if (error || dom === undefined) {
     console.log(error);
-    if(!dom) console.log('dom in BitVaultHandler is undefined.')
+    if(!dom) console.log('dom is undefined.')
     return;
   }
   
   var new_items = [];
   var items = dom['items'];
-      
+  
+  lastList[feed.name] = new Date(lastList[feed.name]);
+  
+  console.log('[!!] Last fetch of '+feed.name+': '+lastList[feed.name]);
+  
   if(!lastList[feed.name]) {
     console.log('[!!] ' + feed.name + ' first fetch.');
     new_items = items;

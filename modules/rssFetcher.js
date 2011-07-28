@@ -59,6 +59,7 @@ function RssFetcher(config, bot) {
 
       console.log("[!!] Opening data file: " + filename);
       lastList[feed.name] = fs.readFileSync(filename,'utf8').replace('\n','');
+      console.log("[!!] Read: " + lastList[feed.name]);
     });
   }
 }
@@ -81,15 +82,35 @@ RssFetcher.prototype.start = function() {
   
   function sendNewItems (feed, new_items){
     var filename = __basedir + "/.rss-" + feed.name + ".db";
+    console.log('[!!] Writing ' + lastList[feed.name] + ' in ' + filename);
     fs.writeFileSync(filename, lastList[feed.name]+'\n', 'utf8');
     
-    var new_items = new_items.slice(0,feed.limit).reverse();
+    // filter items
+    if(feed.filter) {
+      
+      new_items = new_items.filter(function(elm){
+        var filtered = false;
+        feed.filter.forEach(function(r) {
+          var regexp = new RegExp(r);
+          if(elm.title.match(regexp)) {
+            filtered = true;
+          }
+        });
+        return filtered;
+      });
+    }
+    
+    if(feed.limit) {
+      new_items = new_items.slice(0,feed.limit);
+    }
+    
+    new_items = new_items.reverse();
     console.log("[!!] There are " + new_items.length + " new items for " + feed.name);
 
     new_items.forEach(function(item) {
       var channels = feed.channels;
       var format   = formats[feed.name];
-      console.log(format(feed, item));
+      console.log(format(feed, item)+" pubDate: "+item.pubDate);
       
       channels.forEach(function(channel){
         that.bot.say(channel, format(feed, item));
@@ -101,7 +122,7 @@ RssFetcher.prototype.start = function() {
 
     console.log('[!!] Fetching feed for ' + feed.name + ' ..');
 
-    var fhandler = handlers[feed.name].bind({}, feed, cb, lastList);    
+    var fhandler = handlers[feed.name].bind({}, feed, cb, lastList);
     var handler  = new htmlparser.RssHandler(fhandler);
     var parser   = new htmlparser.Parser(handler);
 
