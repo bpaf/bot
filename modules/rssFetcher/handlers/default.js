@@ -1,12 +1,10 @@
-exports.url = "http://feedhint.com/handler.php?";
+var ent = require('ent');
 
 exports.handler = function(feed, callback, lastList, error, dom) {
   
-  if (error) {
-    throw new Error(error)
-  }
-  if (dom === undefined) {
-    console.log('dom in HNHandler is undefined.')
+  if (error || dom === undefined) {
+    console.log(error);
+    if(!dom) console.log('dom in BitVaultHandler is undefined.')
     return;
   }
   
@@ -30,6 +28,7 @@ exports.handler = function(feed, callback, lastList, error, dom) {
   callback(new_items);
 }
 
-exports.format = function (data) {
-  return "HN: " + data.title + " - " + data.link;
+exports.format = function (feed, data) {
+  var title = ent.decode(data.title);
+  return "["+feed.name+"] " + title + " - " + data.link;
 }

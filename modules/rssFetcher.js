@@ -9,7 +9,7 @@ var fs          = require('fs'),
     util        = require('util'),
     htmlparser  = require('htmlparser'),
     request     = require('request');
-
+    
 module.exports = RssFetcher;
 
 function RssFetcher(config, bot) {  
@@ -21,23 +21,31 @@ function RssFetcher(config, bot) {
   
   function loadHandlers(config) {
     var handlers_path = __dirname + '/rssFetcher/handlers/';
-    var files = fs.readdirSync(handlers_path);
+    var rss_feeds = config.rss_feeds;
+    var default_handler = require(handlers_path + 'default');
     
-    files.forEach(function(file){
-      file = /(.+)\.js$/.exec(file);
+    rss_feeds.forEach(function(feed){
       
-      if(file){
-        var feed = require(handlers_path + file[0]);
-        feed.name = file[1];
-        handlers[feed.name] = feed.handler;
-        formats[feed.name] = feed.format;
-                
-        config['rss_feeds'].forEach(function(elm) {
-          if (elm.name == feed.name)
-            elm.url = feed.url;
-        });
+      try{
+        var file = require(handlers_path + feed.name);
       }
-    });
+      catch(e){
+        var file = {};
+      }
+      handlers[feed.name] = file.handler || default_handler.handler;
+      formats[feed.name] = file.format || default_handler.format;
+              
+      config['rss_feeds'].forEach(function(elm) {
+        if (elm.name == feed.name) {
+          elm.url = file.url || elm.url;
+          console.log(util.inspect(elm));
+          if(!elm.url && !file.url) {
+            throw new Error('Error: no specified url for ' + elm.name);
+          }
+        }
+      });
+       
+    });  
   }
   
   function loadData() {
@@ -81,10 +89,10 @@ RssFetcher.prototype.start = function() {
     new_items.forEach(function(item) {
       var channels = feed.channels;
       var format   = formats[feed.name];
-      console.log(format(item));
+      console.log(format(feed, item));
       
       channels.forEach(function(channel){
-        that.bot.say(channel, format(item));
+        that.bot.say(channel, format(feed, item));
       });
     });
   }

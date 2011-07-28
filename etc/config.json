@@ -16,7 +16,8 @@
         "name": "HackerNews",
         "refresh_time": 60,
         "limit": 5,
-        "channels": ["#IRC_CHANNEL_NAME", ...]
+        "channels": ["#IRC_CHANNEL_NAME", ...],
+        "url": "http://feedhint.com/handler.php?"
       }
     ]
   }
