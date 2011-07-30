@@ -77,18 +77,20 @@ bot.onMessage = function(channel, callback) {
 // hook up a module.handler function (to the relevant message#channel events)
 //  and module.{start,stop} if needed (resp. now and at ^C)
 bot.hook = function(module) {
-  var channels = []
-  if ('channels' in config[module.name]) {
-    channels = config[module.name].channels
-  } else {
-    channels = config.irc.channels
+  if (module.handler) {
+    var channels = []
+    if ('channels' in config[module.name]) {
+      channels = config[module.name].channels
+    } else {
+      channels = config.irc.channels
+    }
+    channels.forEach(function(channel) {
+      var callback = module.handler.bind(module)
+      callback.module_name = module.name
+      bot.chatty.on(channel, module.name)
+      bot.onMessage(channel, callback)
+    })
   }
-  channels.forEach(function(channel) {
-    var callback = module.handler.bind(module)
-    callback.module_name = module.name
-    bot.chatty.on(channel, module.name)
-    bot.onMessage(channel, callback)
-  })
   if (module.stop) {
     void bot.stopHandlers.push(module.stop.bind(module))
   }
